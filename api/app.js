@@ -15,6 +15,7 @@ mongoose.connect(mongoUrl, { useNewUrlParser: true })
     console.error('Unable to connect to MongoDB');
   });
 
+// Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
