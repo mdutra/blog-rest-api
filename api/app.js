@@ -23,4 +23,12 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use('/authors', authorRoutes);
 
+app.use((err, req, res, next) => {
+  if (err.name === 'ValidationError') {
+    res.status(422).send(err);
+  } else {
+    next(err);
+  }
+});
+
 module.exports = app;

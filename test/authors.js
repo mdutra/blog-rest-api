@@ -38,4 +38,40 @@ describe('Authors', function () {
         });
     });
   });
+
+  describe('POST requests', function () {
+    it('should store author', function () {
+      const author = {
+        firstName: faker.name.firstName(),
+        lastName: faker.name.lastName(),
+      };
+
+      return chai.request(app)
+        .post('/authors')
+        .send(author)
+        .then((res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          res.body.should.have.property('firstName');
+          res.body.should.have.property('lastName');
+        });
+    });
+
+    it('should not store author without firstName and lastName', function () {
+      const author = {};
+
+      return chai.request(app)
+        .post('/authors')
+        .send(author)
+        .then((res) => {
+          res.should.have.status(422);
+          res.body.should.be.a('object');
+          res.body.should.have.property('errors');
+          res.body.errors.should.have.property('firstName');
+          res.body.errors.firstName.should.have.property('kind').eql('required');
+          res.body.errors.should.have.property('lastName');
+          res.body.errors.lastName.should.have.property('kind').eql('required');
+        });
+    });
+  });
 });

@@ -6,6 +6,11 @@ const authorController = {
       .then(res.json.bind(res))
       .catch(next);
   },
+  createAuthor(req, res, next) {
+    Author.create(req.body)
+      .then(res.json.bind(res))
+      .catch(next);
+  },
 };
 
 module.exports = authorController;
