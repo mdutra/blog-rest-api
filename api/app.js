@@ -3,6 +3,8 @@ const debug = require('debug')('blog-api:server');
 const express = require('express');
 const mongoose = require('mongoose');
 
+const authorRoutes = require('./routes/authorRoutes');
+
 const app = express();
 
 // Mongoose connection
@@ -18,5 +20,7 @@ mongoose.connect(mongoUrl, { useNewUrlParser: true })
 // Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.use('/authors', authorRoutes);
 
 module.exports = app;
