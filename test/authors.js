@@ -110,4 +110,26 @@ describe('Authors', function () {
         });
     });
   });
+
+  describe('PUT requests', function () {
+    it('should update author\'s firstName', function () {
+      const author = {
+        firstName: faker.name.firstName(),
+        lastName: faker.name.lastName(),
+      };
+
+      const newFirstName = faker.name.firstName();
+
+      return Author.create(author)
+        .then(({ _id }) => chai.request(app)
+          .put(`/authors/${_id}`)
+          .send({ firstName: newFirstName }))
+        .then((res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          res.body.should.have.property('firstName').eql(newFirstName);
+          res.body.should.have.property('lastName').eql(author.lastName);
+        });
+    });
+  });
 });

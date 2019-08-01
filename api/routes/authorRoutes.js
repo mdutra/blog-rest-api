@@ -9,6 +9,7 @@ router.route('/')
   .post(authorController.createAuthor);
 
 router.route('/:id')
-  .get(authorController.findAuthorById);
+  .get(authorController.findAuthorById)
+  .put(authorController.updateAuthor);
 
 module.exports = router;

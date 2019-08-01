@@ -24,6 +24,23 @@ const authorController = {
       .then(res.json.bind(res))
       .catch(next);
   },
+  updateAuthor(req, res, next) {
+    const filter = { _id: req.params.id };
+    const replacement = req.body;
+    const options = { new: true };
+
+    Author.findOneAndUpdate(filter, replacement, options)
+      .then((author) => {
+        if (!author) {
+          const err = new Error('Author not found for the given ObjectId');
+          err.name = 'NotFoundError';
+          throw err;
+        }
+
+        res.json(author);
+      })
+      .catch(next);
+  },
 };
 
 module.exports = authorController;
