@@ -37,6 +37,42 @@ describe('Authors', function () {
           res.body.length.should.be.eql(0);
         });
     });
+
+    it('should not get author by ID', function () {
+      return chai.request(app)
+        .get('/authors/5d43316b9d58c840821af979')
+        .then((res) => {
+          res.should.have.status(404);
+          res.body.should.be.a('object');
+          res.body.should.have.property('name').eql('NotFoundError');
+        });
+    });
+
+    it('should get author by ID', function () {
+      const author = {
+        firstName: faker.name.firstName(),
+        lastName: faker.name.lastName(),
+      };
+
+      return Author.create(author)
+        .then(({ _id }) => chai.request(app).get(`/authors/${_id}`))
+        .then((res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          res.body.should.have.property('firstName');
+          res.body.should.have.property('lastName');
+        });
+    });
+
+    it('should not get author with invalid ID', function () {
+      return chai.request(app)
+        .get(`/authors/id_${faker.random.number()}`)
+        .then((res) => {
+          res.should.have.status(422);
+          res.body.should.be.a('object');
+          res.body.should.have.property('kind').eql('ObjectId');
+        });
+    });
   });
 
   describe('POST requests', function () {

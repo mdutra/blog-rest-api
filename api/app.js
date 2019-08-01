@@ -26,10 +26,18 @@ app.use('/authors', authorRoutes);
 app.use('/posts', postRoutes);
 
 app.use((err, req, res, next) => {
-  if (err.name === 'ValidationError') {
-    res.status(422).send(err);
-  } else {
-    next(err);
+  switch (err.name) {
+    case 'ValidationError':
+      res.status(422).send(err);
+      break;
+    case 'CastError':
+      res.status(422).send(err);
+      break;
+    case 'NotFoundError':
+      res.status(404).send(err);
+      break;
+    default:
+      next(err);
   }
 });
 
