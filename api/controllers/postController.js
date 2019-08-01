@@ -6,6 +6,11 @@ const postController = {
       .then(res.json.bind(res))
       .catch(next);
   },
+  createPost(req, res, next) {
+    Post.create(req.body)
+      .then(res.json.bind(res))
+      .catch(next);
+  },
 };
 
 module.exports = postController;
