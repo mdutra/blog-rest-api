@@ -4,6 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const authorRoutes = require('./routes/authorRoutes');
+const postRoutes = require('./routes/postRoutes');
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use('/authors', authorRoutes);
+app.use('/posts', postRoutes);
 
 app.use((err, req, res, next) => {
   if (err.name === 'ValidationError') {
