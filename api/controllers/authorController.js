@@ -41,6 +41,13 @@ const authorController = {
       })
       .catch(next);
   },
+  deleteAuthor(req, res, next) {
+    Author.deleteOne({ _id: req.params.id })
+      .then(() => {
+        res.status(204).json({});
+      })
+      .catch(next);
+  },
 };
 
 module.exports = authorController;

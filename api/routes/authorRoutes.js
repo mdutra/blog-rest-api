@@ -10,6 +10,7 @@ router.route('/')
 
 router.route('/:id')
   .get(authorController.findAuthorById)
-  .put(authorController.updateAuthor);
+  .put(authorController.updateAuthor)
+  .delete(authorController.deleteAuthor);
 
 module.exports = router;

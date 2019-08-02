@@ -132,4 +132,21 @@ describe('Authors', function () {
         });
     });
   });
+
+  describe('DELETE requests', function () {
+    it('should delete author by ID', function () {
+      const author = {
+        firstName: faker.name.firstName(),
+        lastName: faker.name.lastName(),
+      };
+
+      return Author.create(author)
+        .then(({ _id }) => chai.request(app)
+          .delete(`/authors/${_id}`))
+        .then((res) => {
+          res.should.have.status(204);
+          res.body.should.be.eql({});
+        });
+    });
+  });
 });
