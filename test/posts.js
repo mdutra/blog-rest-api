@@ -146,4 +146,30 @@ describe('Posts', function () {
         });
     });
   });
+
+  describe('DELETE requests', function () {
+    it('should delete blog post by ID', function () {
+      const author = {
+        firstName: faker.name.firstName(),
+        lastName: faker.name.lastName(),
+      };
+
+      return Author.create(author)
+        .then(({ _id }) => {
+          const post = {
+            title: faker.lorem.words(),
+            content: faker.lorem.paragraphs(),
+            authors: [_id],
+          };
+
+          return Post.create(post);
+        })
+        .then(({ _id }) => chai.request(app)
+          .delete(`/posts/${_id}`))
+        .then((res) => {
+          res.should.have.status(204);
+          res.body.should.be.eql({});
+        });
+    });
+  });
 });

@@ -24,6 +24,13 @@ const postController = {
       .then(res.json.bind(res))
       .catch(next);
   },
+  deletePost(req, res, next) {
+    Post.findByIdAndDelete(req.params.id)
+      .then(() => {
+        res.status(204).json({});
+      })
+      .catch(next);
+  },
 };
 
 module.exports = postController;
