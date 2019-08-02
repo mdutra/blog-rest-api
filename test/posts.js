@@ -21,8 +21,8 @@ describe('Posts', function () {
   // Empty collections before each test
   beforeEach(function () {
     return Promise.all([
-      Author.remove({}),
-      Post.remove({}),
+      Author.deleteMany({}),
+      Post.deleteMany({}),
     ]);
   });
 

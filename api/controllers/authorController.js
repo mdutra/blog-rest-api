@@ -27,7 +27,10 @@ const authorController = {
   updateAuthor(req, res, next) {
     const filter = { _id: req.params.id };
     const replacement = req.body;
-    const options = { new: true };
+    const options = {
+      new: true,
+      useFindAndModify: false,
+    };
 
     Author.findOneAndUpdate(filter, replacement, options)
       .then((author) => {

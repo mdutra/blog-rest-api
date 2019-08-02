@@ -19,7 +19,7 @@ faker.locale = 'pt_BR';
 describe('Authors', function () {
   // Empty collection before each test
   beforeEach(function () {
-    return Author.remove({});
+    return Author.deleteMany({});
   });
 
   afterEach(function () {
