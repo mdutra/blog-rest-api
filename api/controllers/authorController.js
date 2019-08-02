@@ -25,14 +25,14 @@ const authorController = {
       .catch(next);
   },
   updateAuthor(req, res, next) {
-    const filter = { _id: req.params.id };
+    const { id } = req.params;
     const replacement = req.body;
     const options = {
       new: true,
       useFindAndModify: false,
     };
 
-    Author.findOneAndUpdate(filter, replacement, options)
+    Author.findByIdAndUpdate(id, replacement, options)
       .then((author) => {
         if (!author) {
           const err = new Error('Author not found for the given ObjectId');
