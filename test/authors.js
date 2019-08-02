@@ -48,6 +48,28 @@ describe('Authors', function () {
         });
     });
 
+    it('should get list of 5 authors', function () {
+      const authors = [...new Array(5)]
+        .map(() => ({
+          firstName: faker.name.firstName(),
+          lastName: faker.name.lastName(),
+        }));
+
+      return Author.create(authors)
+        .then(() => chai.request(app)
+          .get('/authors'))
+        .then((res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          res.body.length.should.be.eql(5);
+          res.body.forEach((author, i) => {
+            res.body[i].should.be.a('object');
+            res.body[i].should.have.property('firstName');
+            res.body[i].should.have.property('lastName');
+          });
+        });
+    });
+
     it('should get author by ID', function () {
       const author = {
         firstName: faker.name.firstName(),
