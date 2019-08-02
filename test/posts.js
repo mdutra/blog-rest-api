@@ -41,6 +41,55 @@ describe('Posts', function () {
           res.body.length.should.be.eql(0);
         });
     });
+
+    it('should not get post by ID', function () {
+      return chai.request(app)
+        .get('/posts/5d43316b9d58c840821af979')
+        .then((res) => {
+          res.should.have.status(404);
+          res.body.should.be.a('object');
+          res.body.should.have.property('name').eql('NotFoundError');
+        });
+    });
+
+    it('should get post by ID', function () {
+      const author = {
+        firstName: faker.name.firstName(),
+        lastName: faker.name.lastName(),
+      };
+
+      return Author.create(author)
+        .then(({ _id }) => {
+          const post = {
+            title: faker.lorem.words(),
+            content: faker.lorem.paragraphs(),
+            authors: [_id],
+          };
+
+          return Post.create(post);
+        })
+        .then(({ _id }) => chai.request(app)
+          .get(`/posts/${_id}`))
+        .then((res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          res.body.should.have.property('title');
+          res.body.should.have.property('content');
+          res.body.should.have.property('published');
+          res.body.should.have.property('authors');
+          res.body.authors.length.should.be.above(0);
+        });
+    });
+
+    it('should not get post with invalid ID', function () {
+      return chai.request(app)
+        .get(`/posts/id_${faker.random.number()}`)
+        .then((res) => {
+          res.should.have.status(422);
+          res.body.should.be.a('object');
+          res.body.should.have.property('kind').eql('ObjectId');
+        });
+    });
   });
 
   describe('POST requests', function () {
