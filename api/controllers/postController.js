@@ -10,7 +10,7 @@ const postController = {
     Post.findById(req.params.id)
       .then((post) => {
         if (!post) {
-          const err = new Error('Author not found for the given ObjectId');
+          const err = new Error('Blog post not found for the given ObjectId');
           err.name = 'NotFoundError';
           throw err;
         }
