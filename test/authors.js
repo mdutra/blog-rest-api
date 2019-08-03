@@ -44,10 +44,10 @@ describe('Authors', function () {
           res.should.have.status(200);
           res.body.should.be.a('array');
           res.body.length.should.be.eql(10);
-          res.body.forEach((author, i) => {
-            res.body[i].should.be.a('object');
-            res.body[i].should.have.property('firstName');
-            res.body[i].should.have.property('lastName');
+          res.body.forEach((author) => {
+            author.should.be.a('object');
+            author.should.have.property('firstName');
+            author.should.have.property('lastName');
           });
         });
     });
