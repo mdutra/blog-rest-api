@@ -17,9 +17,18 @@ chai.use(chaiHttp);
 faker.locale = 'pt_BR';
 
 describe('Authors', function () {
-  // Empty collection before each test
-  beforeEach(function () {
-    return Author.deleteMany({});
+  // Delete and populate database before tests
+  before(function () {
+    return Author.deleteMany({})
+      .then(() => {
+        const authors = [...new Array(10)]
+          .map(() => ({
+            firstName: faker.name.firstName(),
+            lastName: faker.name.lastName(),
+          }));
+
+        return Author.create(authors);
+      });
   });
 
   afterEach(function () {
@@ -28,40 +37,13 @@ describe('Authors', function () {
   });
 
   describe('GET requests', function () {
-    it('should get empty list of authors', function () {
+    it('should get list of authors', function () {
       return chai.request(app)
         .get('/authors')
         .then((res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(0);
-        });
-    });
-
-    it('should not get author by ID', function () {
-      return chai.request(app)
-        .get('/authors/5d43316b9d58c840821af979')
-        .then((res) => {
-          res.should.have.status(404);
-          res.body.should.be.a('object');
-          res.body.should.have.property('name').eql('NotFoundError');
-        });
-    });
-
-    it('should get list of 5 authors', function () {
-      const authors = [...new Array(5)]
-        .map(() => ({
-          firstName: faker.name.firstName(),
-          lastName: faker.name.lastName(),
-        }));
-
-      return Author.create(authors)
-        .then(() => chai.request(app)
-          .get('/authors'))
-        .then((res) => {
-          res.should.have.status(200);
-          res.body.should.be.a('array');
-          res.body.length.should.be.eql(5);
+          res.body.length.should.be.eql(10);
           res.body.forEach((author, i) => {
             res.body[i].should.be.a('object');
             res.body[i].should.have.property('firstName');
@@ -71,18 +53,25 @@ describe('Authors', function () {
     });
 
     it('should get author by ID', function () {
-      const author = {
-        firstName: faker.name.firstName(),
-        lastName: faker.name.lastName(),
-      };
-
-      return Author.create(author)
-        .then(({ _id }) => chai.request(app).get(`/authors/${_id}`))
+      return Author.findOne()
+        .then(({ _id }) => chai.request(app)
+          .get(`/authors/${_id}`))
         .then((res) => {
           res.should.have.status(200);
           res.body.should.be.a('object');
           res.body.should.have.property('firstName');
           res.body.should.have.property('lastName');
+        });
+    });
+
+    it('should not find author by ID after deleting it', function () {
+      return Author.findOneAndDelete()
+        .then(({ _id }) => chai.request(app)
+          .get(`/authors/${_id}`))
+        .then((res) => {
+          res.should.have.status(404);
+          res.body.should.be.a('object');
+          res.body.should.have.property('name').eql('NotFoundError');
         });
     });
 
@@ -135,14 +124,9 @@ describe('Authors', function () {
 
   describe('PUT requests', function () {
     it('should update author\'s firstName', function () {
-      const author = {
-        firstName: faker.name.firstName(),
-        lastName: faker.name.lastName(),
-      };
-
       const newFirstName = faker.name.firstName();
 
-      return Author.create(author)
+      return Author.findOne()
         .then(({ _id }) => chai.request(app)
           .put(`/authors/${_id}`)
           .send({ firstName: newFirstName }))
@@ -150,19 +134,13 @@ describe('Authors', function () {
           res.should.have.status(200);
           res.body.should.be.a('object');
           res.body.should.have.property('firstName').eql(newFirstName);
-          res.body.should.have.property('lastName').eql(author.lastName);
         });
     });
   });
 
   describe('DELETE requests', function () {
     it('should delete author by ID', function () {
-      const author = {
-        firstName: faker.name.firstName(),
-        lastName: faker.name.lastName(),
-      };
-
-      return Author.create(author)
+      return Author.findOne()
         .then(({ _id }) => chai.request(app)
           .delete(`/authors/${_id}`))
         .then((res) => {
