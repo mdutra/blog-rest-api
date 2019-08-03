@@ -32,6 +32,9 @@ const postController = {
       useFindAndModify: false,
     };
 
+    // Prevent field from update
+    delete replacement.published;
+
     Post.findByIdAndUpdate(id, replacement, options)
       .then((post) => {
         if (!post) {
