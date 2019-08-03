@@ -24,6 +24,26 @@ const postController = {
       .then(res.json.bind(res))
       .catch(next);
   },
+  updatePost(req, res, next) {
+    const { id } = req.params;
+    const replacement = req.body;
+    const options = {
+      new: true,
+      useFindAndModify: false,
+    };
+
+    Post.findByIdAndUpdate(id, replacement, options)
+      .then((post) => {
+        if (!post) {
+          const err = new Error('Blog post not found for the given ObjectId');
+          err.name = 'NotFoundError';
+          throw err;
+        }
+
+        res.json(post);
+      })
+      .catch(next);
+  },
   deletePost(req, res, next) {
     Post.findByIdAndDelete(req.params.id)
       .then(() => {

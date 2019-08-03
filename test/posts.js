@@ -154,6 +154,22 @@ describe('Posts', function () {
     });
   });
 
+  describe('PUT requests', function () {
+    it('should update blog post\'s title', function () {
+      const newTitle = faker.lorem.words();
+
+      return Post.findOne()
+        .then(({ _id }) => chai.request(app)
+          .put(`/posts/${_id}`)
+          .send({ title: newTitle }))
+        .then((res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          res.body.should.have.property('title').eql(newTitle);
+        });
+    });
+  });
+
   describe('DELETE requests', function () {
     it('should delete blog post by ID', function () {
       return Post.findOne()

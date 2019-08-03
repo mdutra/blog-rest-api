@@ -10,6 +10,7 @@ router.route('/')
 
 router.route('/:id')
   .get(postController.findPostById)
+  .put(postController.updatePost)
   .delete(postController.deletePost);
 
 module.exports = router;
