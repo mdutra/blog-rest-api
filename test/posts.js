@@ -166,6 +166,7 @@ describe('Posts', function () {
           res.should.have.status(200);
           res.body.should.be.a('object');
           res.body.should.have.property('title').eql(newTitle);
+          res.body.should.have.property('updated');
         });
     });
   });
