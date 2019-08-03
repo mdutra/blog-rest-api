@@ -18,12 +18,29 @@ chai.use(chaiHttp);
 faker.locale = 'pt_BR';
 
 describe('Posts', function () {
-  // Empty collections before each test
-  beforeEach(function () {
+  // Delete and populate database before tests
+  before(function () {
     return Promise.all([
       Author.deleteMany({}),
       Post.deleteMany({}),
-    ]);
+    ]).then(() => {
+      const authors = [...new Array(10)]
+        .map(() => ({
+          firstName: faker.name.firstName(),
+          lastName: faker.name.lastName(),
+        }));
+
+      return Author.create(authors);
+    }).then((authors) => {
+      const posts = authors.map(({ _id }) => ({
+        title: faker.lorem.words(),
+        subtitle: faker.lorem.words(),
+        content: faker.lorem.paragraphs(),
+        authors: [_id],
+      }));
+
+      return Post.create(posts);
+    });
   });
 
   afterEach(function () {
@@ -32,42 +49,26 @@ describe('Posts', function () {
   });
 
   describe('GET requests', function () {
-    it('should get empty list of posts', function () {
+    it('should get list of posts', function () {
       return chai.request(app)
         .get('/posts')
         .then((res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(0);
+          res.body.forEach((post) => {
+            post.should.be.a('object');
+            post.should.have.property('title');
+            post.should.have.property('subtitle');
+            post.should.have.property('content');
+            post.should.have.property('authors');
+            post.authors.should.be.a('array');
+            post.authors.length.should.be.above(0);
+          });
         });
     });
 
-    it('should not get post by ID', function () {
-      return chai.request(app)
-        .get('/posts/5d43316b9d58c840821af979')
-        .then((res) => {
-          res.should.have.status(404);
-          res.body.should.be.a('object');
-          res.body.should.have.property('name').eql('NotFoundError');
-        });
-    });
-
-    it('should get post by ID', function () {
-      const author = {
-        firstName: faker.name.firstName(),
-        lastName: faker.name.lastName(),
-      };
-
-      return Author.create(author)
-        .then(({ _id }) => {
-          const post = {
-            title: faker.lorem.words(),
-            content: faker.lorem.paragraphs(),
-            authors: [_id],
-          };
-
-          return Post.create(post);
-        })
+    it('should get blog post by ID', function () {
+      return Post.findOne()
         .then(({ _id }) => chai.request(app)
           .get(`/posts/${_id}`))
         .then((res) => {
@@ -81,7 +82,18 @@ describe('Posts', function () {
         });
     });
 
-    it('should not get post with invalid ID', function () {
+    it('should not find blog post by ID after deleting it', function () {
+      return Post.findOneAndDelete()
+        .then(({ _id }) => chai.request(app)
+          .get(`/posts/${_id}`))
+        .then((res) => {
+          res.should.have.status(404);
+          res.body.should.be.a('object');
+          res.body.should.have.property('name').eql('NotFoundError');
+        });
+    });
+
+    it('should not get blog post with invalid ID', function () {
       return chai.request(app)
         .get(`/posts/id_${faker.random.number()}`)
         .then((res) => {
@@ -94,12 +106,7 @@ describe('Posts', function () {
 
   describe('POST requests', function () {
     it('should store blog post', function () {
-      const author = {
-        firstName: faker.name.firstName(),
-        lastName: faker.name.lastName(),
-      };
-
-      return Author.create(author)
+      return Author.findOne()
         .then(({ _id }) => {
           const post = {
             title: faker.lorem.words(),
@@ -149,21 +156,7 @@ describe('Posts', function () {
 
   describe('DELETE requests', function () {
     it('should delete blog post by ID', function () {
-      const author = {
-        firstName: faker.name.firstName(),
-        lastName: faker.name.lastName(),
-      };
-
-      return Author.create(author)
-        .then(({ _id }) => {
-          const post = {
-            title: faker.lorem.words(),
-            content: faker.lorem.paragraphs(),
-            authors: [_id],
-          };
-
-          return Post.create(post);
-        })
+      return Post.findOne()
         .then(({ _id }) => chai.request(app)
           .delete(`/posts/${_id}`))
         .then((res) => {
