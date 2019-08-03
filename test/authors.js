@@ -43,7 +43,6 @@ describe('Authors', function () {
         .then((res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(10);
           res.body.forEach((author) => {
             author.should.be.a('object');
             author.should.have.property('firstName');
