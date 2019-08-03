@@ -7,6 +7,8 @@ const commentSchema = new Schema({
     required: true,
     ref: 'users',
   },
+}, {
+  versionKey: false,
 });
 
 const postSchema = new Schema({
@@ -20,6 +22,8 @@ const postSchema = new Schema({
     validate: [a => a.length > 0, 'At least one author is required'],
   },
   comments: [commentSchema],
+}, {
+  versionKey: false,
 });
 
 module.exports = model('posts', postSchema);
