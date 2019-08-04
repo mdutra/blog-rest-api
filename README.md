@@ -6,6 +6,10 @@ Dependencies: Node.js, NPM and MongoDB.
 $ npm install
 ```
 ### Usage
+Store fake data on the database:
+```
+$ npm run populatedb
+```
 Start the MongoDB server and run:
 ```
 $ npm run serve

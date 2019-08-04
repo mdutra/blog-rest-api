@@ -11,7 +11,8 @@
     "start": "node server.js",
     "serve": "NODE_ENV=production node server.js",
     "lint": "eslint server.js api/ test/",
-    "test": "NODE_ENV=test mocha --watch --timeout 5000"
+    "test": "NODE_ENV=test mocha --watch --timeout 5000",
+    "populatedb": "node populatedb.js"
   },
   "repository": {
     "type": "git",
