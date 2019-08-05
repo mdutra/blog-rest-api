@@ -75,12 +75,16 @@ describe('Authors', function () {
     });
 
     it('should not get author with invalid ID', function () {
+      const invalidId = `id_${faker.random.number()}`;
       return chai.request(app)
-        .get(`/authors/id_${faker.random.number()}`)
+        .get(`/authors/${invalidId}`)
         .then((res) => {
           res.should.have.status(422);
           res.body.should.be.a('object');
-          res.body.should.have.property('kind').eql('ObjectId');
+          res.body.should.have.property('error');
+          res.body.should.have.property('name').eql('CastError');
+          res.body.should.have.property('path').eql('_id');
+          res.body.should.have.property('value').eql(invalidId);
         });
     });
   });

@@ -94,12 +94,17 @@ describe('Posts', function () {
     });
 
     it('should not get blog post with invalid ID', function () {
+      const invalidId = `id_${faker.random.number()}`;
+
       return chai.request(app)
-        .get(`/posts/id_${faker.random.number()}`)
+        .get(`/posts/${invalidId}`)
         .then((res) => {
           res.should.have.status(422);
           res.body.should.be.a('object');
-          res.body.should.have.property('kind').eql('ObjectId');
+          res.body.should.have.property('error');
+          res.body.should.have.property('name').eql('CastError');
+          res.body.should.have.property('path').eql('_id');
+          res.body.should.have.property('value').eql(invalidId);
         });
     });
   });

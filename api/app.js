@@ -39,7 +39,7 @@ app.use((err, req, res, next) => {
         .map(val => formatError(val)));
       break;
     case 'CastError':
-      res.status(422).send(err);
+      res.status(422).send(formatError(err));
       break;
     case 'NotFoundError':
       res.status(404).send(err);
