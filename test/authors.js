@@ -111,12 +111,13 @@ describe('Authors', function () {
         .send(author)
         .then((res) => {
           res.should.have.status(422);
-          res.body.should.be.a('object');
-          res.body.should.have.property('errors');
-          res.body.errors.should.have.property('firstName');
-          res.body.errors.firstName.should.have.property('kind').eql('required');
-          res.body.errors.should.have.property('lastName');
-          res.body.errors.lastName.should.have.property('kind').eql('required');
+          res.body.should.be.an('array');
+          res.body.length.should.be.eql(2);
+          res.body.forEach((error) => {
+            error.should.have.property('error');
+            error.should.have.property('name').eql('ValidationError');
+            error.should.have.property('path');
+          });
         });
     });
   });

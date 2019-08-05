@@ -26,9 +26,17 @@ app.use('/authors', authorRoutes);
 app.use('/posts', postRoutes);
 
 app.use((err, req, res, next) => {
+  const formatError = ({ message, path, value }) => ({
+    error: message,
+    name: err.name,
+    path,
+    value,
+  });
+
   switch (err.name) {
     case 'ValidationError':
-      res.status(422).send(err);
+      res.status(422).send(Object.values(err.errors)
+        .map(val => formatError(val)));
       break;
     case 'CastError':
       res.status(422).send(err);

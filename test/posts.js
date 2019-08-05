@@ -141,15 +141,13 @@ describe('Posts', function () {
         .send(post)
         .then((res) => {
           res.should.have.status(422);
-          res.body.should.be.a('object');
-          res.body.should.have.property('errors');
-          res.body.errors.should.have.property('title');
-          res.body.errors.title.should.have.property('kind').eql('required');
-          res.body.errors.should.have.property('content');
-          res.body.errors.content.should.have.property('kind').eql('required');
-          res.body.errors.should.have.property('authors');
-          res.body.errors.authors.should.have.property('message')
-            .eql('At least one author is required');
+          res.body.should.be.a('array');
+          res.body.length.should.be.eql(3);
+          res.body.forEach((error) => {
+            error.should.have.property('error');
+            error.should.have.property('name').eql('ValidationError');
+            error.should.have.property('path');
+          });
         });
     });
   });
