@@ -136,7 +136,7 @@ describe('Posts', function () {
         subtitle: faker.lorem.words(),
       };
 
-      chai.request(app)
+      return chai.request(app)
         .post('/posts')
         .send(post)
         .then((res) => {
