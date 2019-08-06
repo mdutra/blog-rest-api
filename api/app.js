@@ -41,6 +41,9 @@ app.use((err, req, res, next) => {
     case 'CastError':
       res.status(422).send(formatError(err));
       break;
+    case 'ExpressValidationError':
+      res.status(422).send(err.array());
+      break;
     case 'NotFoundError':
       res.status(404).send(err);
       break;
