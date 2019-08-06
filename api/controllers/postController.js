@@ -1,4 +1,4 @@
-const { body, sanitizeBody } = require('express-validator');
+const { body, param, sanitizeBody } = require('express-validator');
 
 const Post = require('../models/postModel');
 const { throwValidationResults } = require('../utils/');
@@ -9,19 +9,25 @@ const postController = {
       .then(res.json.bind(res))
       .catch(next);
   },
-  findPostById(req, res, next) {
-    Post.findById(req.params.id)
-      .then((post) => {
-        if (!post) {
-          const err = new Error('Blog post not found for the given ObjectId');
-          err.name = 'NotFoundError';
-          throw err;
-        }
+  findPostById: [
+    param('id').isMongoId(),
 
-        res.json(post);
-      })
-      .catch(next);
-  },
+    throwValidationResults,
+
+    (req, res, next) => {
+      Post.findById(req.params.id)
+        .then((post) => {
+          if (!post) {
+            const err = new Error('Blog post not found for the given ObjectId');
+            err.name = 'NotFoundError';
+            throw err;
+          }
+
+          res.json(post);
+        })
+        .catch(next);
+    },
+  ],
   createPost: [
     body('title').isString().trim().isLength({ max: 500 }),
     body('subtitle').optional({ checkFalsy: true }).isString().trim()
@@ -41,6 +47,8 @@ const postController = {
     },
   ],
   updatePost: [
+    param('id').isMongoId(),
+
     body('title').optional({ checkFalsy: true }).isString().trim()
       .isLength({ max: 500 }),
     body('subtitle').optional({ checkFalsy: true }).isString().trim()
@@ -80,13 +88,19 @@ const postController = {
         .catch(next);
     },
   ],
-  deletePost(req, res, next) {
-    Post.findByIdAndDelete(req.params.id)
-      .then(() => {
-        res.status(204).json({});
-      })
-      .catch(next);
-  },
+  deletePost: [
+    param('id').isMongoId(),
+
+    throwValidationResults,
+
+    (req, res, next) => {
+      Post.findByIdAndDelete(req.params.id)
+        .then(() => {
+          res.status(204).json({});
+        })
+        .catch(next);
+    },
+  ],
 };
 
 module.exports = postController;
