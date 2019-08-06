@@ -80,11 +80,11 @@ describe('Authors', function () {
         .get(`/authors/${invalidId}`)
         .then((res) => {
           res.should.have.status(422);
-          res.body.should.be.a('object');
-          res.body.should.have.property('error');
-          res.body.should.have.property('name').eql('CastError');
-          res.body.should.have.property('path').eql('_id');
-          res.body.should.have.property('value').eql(invalidId);
+          res.body.should.be.a('array');
+          res.body[0].should.have.property('error');
+          res.body[0].should.have.property('name');
+          res.body[0].should.have.property('path');
+          res.body[0].should.have.property('value').eql(invalidId);
         });
     });
   });
