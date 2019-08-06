@@ -13,7 +13,7 @@ const utils = {
         .throw();
       next();
     } catch (err) {
-      err.name = 'ExpressValidationError';
+      err.name = 'RequestValidationError';
       next(err);
     }
   },
