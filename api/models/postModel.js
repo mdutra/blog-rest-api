@@ -1,16 +1,5 @@
 const { model, Schema } = require('mongoose');
 
-const commentSchema = new Schema({
-  content: { type: String, required: true },
-  user: {
-    type: Schema.Types.ObjectId,
-    required: true,
-    ref: 'users',
-  },
-}, {
-  versionKey: false,
-});
-
 const postSchema = new Schema({
   title: { type: String, required: true },
   subtitle: String,
@@ -21,7 +10,7 @@ const postSchema = new Schema({
     type: [{ type: Schema.Types.ObjectId, ref: 'authors' }],
     validate: [a => a.length > 0, 'At least one author is required'],
   },
-  comments: [commentSchema],
+  comments: [{ type: Schema.Types.ObjectId, ref: 'comments' }],
 }, {
   versionKey: false,
 });
