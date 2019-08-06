@@ -1,4 +1,7 @@
+const { body, sanitizeBody } = require('express-validator');
+
 const Post = require('../models/postModel');
+const { throwValidationResults } = require('../utils/');
 
 const postController = {
   findAllPosts(req, res, next) {
@@ -19,36 +22,64 @@ const postController = {
       })
       .catch(next);
   },
-  createPost(req, res, next) {
-    Post.create(req.body)
-      .then(res.json.bind(res))
-      .catch(next);
-  },
-  updatePost(req, res, next) {
-    const { id } = req.params;
-    const replacement = req.body;
-    const options = {
-      new: true,
-      useFindAndModify: false,
-    };
+  createPost: [
+    body('title').isString().trim().isLength({ max: 500 }),
+    body('subtitle').optional({ checkFalsy: true }).isString().trim()
+      .isLength({ max: 500 }),
+    body('content').isString(),
+    body('authors').toArray().isLength({ min: 1 }),
+    body('authors.*').isMongoId(),
 
-    // Prevent field from update
-    delete replacement.published;
+    sanitizeBody('*').escape(),
 
-    replacement.updated = new Date();
+    throwValidationResults,
 
-    Post.findByIdAndUpdate(id, replacement, options)
-      .then((post) => {
-        if (!post) {
-          const err = new Error('Blog post not found for the given ObjectId');
-          err.name = 'NotFoundError';
-          throw err;
-        }
+    (req, res, next) => {
+      Post.create(req.body)
+        .then(res.json.bind(res))
+        .catch(next);
+    },
+  ],
+  updatePost: [
+    body('title').optional({ checkFalsy: true }).isString().trim()
+      .isLength({ max: 500 }),
+    body('subtitle').optional({ checkFalsy: true }).isString().trim()
+      .isLength({ max: 500 }),
+    body('content').optional({ checkFalsy: true }).isString(),
+    body('authors').optional({ checkFalsy: true }).toArray()
+      .isLength({ min: 1 }),
+    body('authors.*').isMongoId(),
 
-        res.json(post);
-      })
-      .catch(next);
-  },
+    sanitizeBody('*').escape(),
+
+    throwValidationResults,
+
+    (req, res, next) => {
+      const { id } = req.params;
+      const replacement = req.body;
+      const options = {
+        new: true,
+        useFindAndModify: false,
+      };
+
+      // Prevent field from update
+      delete replacement.published;
+
+      replacement.updated = new Date();
+
+      Post.findByIdAndUpdate(id, replacement, options)
+        .then((post) => {
+          if (!post) {
+            const err = new Error('Blog post not found for the given ObjectId');
+            err.name = 'NotFoundError';
+            throw err;
+          }
+
+          res.json(post);
+        })
+        .catch(next);
+    },
+  ],
   deletePost(req, res, next) {
     Post.findByIdAndDelete(req.params.id)
       .then(() => {
