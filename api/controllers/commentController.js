@@ -42,6 +42,19 @@ const commentController = {
         .catch(next);
     },
   ],
+  deleteComment: [
+    param('id').isMongoId(),
+
+    throwValidationResults,
+
+    (req, res, next) => {
+      Comment.findByIdAndDelete(req.params.id)
+        .then(() => {
+          res.status(204).json({});
+        })
+        .catch(next);
+    },
+  ],
 };
 
 module.exports = commentController;

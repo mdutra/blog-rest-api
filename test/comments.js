@@ -187,4 +187,16 @@ describe('Comments', function () {
         });
     });
   });
+
+  describe('DELETE requests', function () {
+    it('should delete comment by ID', function () {
+      return Comment.findOne()
+        .then(({ _id }) => chai.request(app)
+          .delete(`/comments/${_id}`))
+        .then((res) => {
+          res.should.have.status(204);
+          res.body.should.be.eql({});
+        });
+    });
+  });
 });
