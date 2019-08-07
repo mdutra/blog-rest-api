@@ -45,6 +45,8 @@ const commentController = {
     },
   ],
   createComment: [
+    param('id').isMongoId(),
+
     body('content').isString().trim().isLength({ max: 500 }),
     body('user').isMongoId(),
 
@@ -53,8 +55,26 @@ const commentController = {
     throwValidationResults,
 
     (req, res, next) => {
-      Comment.create(req.body)
-        .then(res.json.bind(res))
+      Post.findById(req.params.id)
+        .then((post) => {
+          if (!post) {
+            const err = new Error('Blog post not found for the given ObjectId');
+            err.name = 'NotFoundError';
+            throw err;
+          }
+
+          // Create document first to use the ID
+          const comment = new Comment(req.body);
+
+          return Promise.all([
+            comment.save(),
+            post.updateOne({ $push: { comments: comment.id } }),
+          ]);
+        })
+        .then((response) => {
+          // Return saved comment
+          res.json(response[0]);
+        })
         .catch(next);
     },
   ],
