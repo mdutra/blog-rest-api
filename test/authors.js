@@ -36,6 +36,10 @@ describe('Authors', function () {
     mongoose.deleteModel(/.+/);
   });
 
+  after(function () {
+    mongoose.connection.close();
+  });
+
   describe('GET requests', function () {
     it('should get list of authors', function () {
       return chai.request(app)
