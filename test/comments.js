@@ -159,7 +159,7 @@ describe('Comments', function () {
         });
     });
 
-    it('should store new comment without content', function () {
+    it('should not store new comment without content', function () {
       return Promise.all([
         User.findOne(),
         Post.findOne(),
