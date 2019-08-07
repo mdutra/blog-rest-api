@@ -76,10 +76,6 @@ describe('Comments', function () {
     mongoose.deleteModel(/.+/);
   });
 
-  after(function () {
-    mongoose.connection.close();
-  });
-
   describe('GET requests', function () {
     it('should get all comments from a blog post', function () {
       return Post.findOne()

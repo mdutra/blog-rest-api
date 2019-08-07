@@ -48,10 +48,6 @@ describe('Posts', function () {
     mongoose.deleteModel(/.+/);
   });
 
-  after(function () {
-    mongoose.connection.close();
-  });
-
   describe('GET requests', function () {
     it('should get list of posts', function () {
       return chai.request(app)
