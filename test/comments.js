@@ -97,4 +97,56 @@ describe('Comments', function () {
         });
     });
   });
+
+  describe('POST requests', function () {
+    it('should store new comment to a blog post', function () {
+      return Promise.all([
+        User.findOne(),
+        Post.findOne(),
+      ])
+        .then(([user, post]) => {
+          /* eslint-disable no-underscore-dangle */
+          const comment = {
+            content: faker.lorem.words(),
+            user: user._id,
+          };
+
+          return chai.request(app)
+            .post(`/posts/${post._id}/comments`)
+            .send(comment);
+          /* eslint-enable no-underscore-dangle */
+        })
+        .then((res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          res.body.should.have.property('content');
+          res.body.should.have.property('published');
+          res.body.should.have.property('user');
+        });
+    });
+
+    it('should store new comment without content', function () {
+      return Promise.all([
+        User.findOne(),
+        Post.findOne(),
+      ])
+        .then(([user, post]) => {
+          /* eslint-disable no-underscore-dangle */
+          const comment = { user: user._id };
+
+          return chai.request(app)
+            .post(`/posts/${post._id}/comments`)
+            .send(comment);
+          /* eslint-enable no-underscore-dangle */
+        })
+        .then((res) => {
+          res.should.have.status(422);
+          res.body.should.be.a('array');
+          res.body.length.should.be.eql(1);
+          res.body[0].should.have.property('error');
+          res.body[0].should.have.property('name').eql('ValidationError');
+          res.body[0].should.have.property('path');
+        });
+    });
+  });
 });

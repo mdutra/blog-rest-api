@@ -15,6 +15,7 @@ router.route('/:id')
   .delete(postController.deletePost);
 
 router.route('/:id/comments')
-  .get(commentController.findAllPostComments);
+  .get(commentController.findAllPostComments)
+  .post(commentController.createComment);
 
 module.exports = router;
