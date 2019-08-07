@@ -42,6 +42,40 @@ const commentController = {
         .catch(next);
     },
   ],
+  updateComment: [
+    param('id').isMongoId(),
+
+    body('content').isString().trim().isLength({ max: 500 }),
+
+    sanitizeBody('*').escape(),
+
+    throwValidationResults,
+
+    (req, res, next) => {
+      const { id } = req.params;
+      const replacement = req.body;
+      const options = {
+        new: true,
+        useFindAndModify: false,
+      };
+
+      // Prevent field from update
+      delete replacement.published;
+      delete replacement.user;
+
+      Comment.findByIdAndUpdate(id, replacement, options)
+        .then((comment) => {
+          if (!comment) {
+            const err = new Error('Comment not found for the given ObjectId');
+            err.name = 'NotFoundError';
+            throw err;
+          }
+
+          res.json(comment);
+        })
+        .catch(next);
+    },
+  ],
   deleteComment: [
     param('id').isMongoId(),
 

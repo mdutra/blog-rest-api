@@ -188,6 +188,22 @@ describe('Comments', function () {
     });
   });
 
+  describe('PUT requests', function () {
+    it('should update comment\'s content', function () {
+      const newContent = faker.lorem.words();
+
+      return Comment.findOne()
+        .then(({ _id }) => chai.request(app)
+          .put(`/comments/${_id}`)
+          .send({ content: newContent }))
+        .then((res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          res.body.should.have.property('content').eql(newContent);
+        });
+    });
+  });
+
   describe('DELETE requests', function () {
     it('should delete comment by ID', function () {
       return Comment.findOne()

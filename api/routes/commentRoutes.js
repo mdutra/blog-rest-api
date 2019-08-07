@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.route('/:id')
   .get(commentController.findCommentById)
+  .put(commentController.updateComment)
   .delete(commentController.deleteComment);
 
 module.exports = router;
