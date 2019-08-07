@@ -1,4 +1,4 @@
-const { body, sanitizeBody } = require('express-validator');
+const { body, param, sanitizeBody } = require('express-validator');
 
 const Comment = require('../models/commentModel');
 const { throwValidationResults } = require('../utils/');
@@ -9,6 +9,25 @@ const commentController = {
       .then(res.json.bind(res))
       .catch(next);
   },
+  findCommentById: [
+    param('id').isMongoId(),
+
+    throwValidationResults,
+
+    (req, res, next) => {
+      Comment.findById(req.params.id)
+        .then((comment) => {
+          if (!comment) {
+            const err = new Error('Comment not found for the given ObjectId');
+            err.name = 'NotFoundError';
+            throw err;
+          }
+
+          res.json(comment);
+        })
+        .catch(next);
+    },
+  ],
   createComment: [
     body('content').isString().trim().isLength({ max: 500 }),
     body('user').isMongoId(),

@@ -96,6 +96,44 @@ describe('Comments', function () {
           });
         });
     });
+
+    it('should get comment by ID', function () {
+      return Comment.findOne()
+        .then(({ _id }) => chai.request(app)
+          .get(`/comments/${_id}`))
+        .then((res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          res.body.should.have.property('content');
+          res.body.should.have.property('published');
+          res.body.should.have.property('user');
+        });
+    });
+
+    it('should not find comment by ID after deleting it', function () {
+      return Comment.findOneAndDelete()
+        .then(({ _id }) => chai.request(app)
+          .get(`/comments/${_id}`))
+        .then((res) => {
+          res.should.have.status(404);
+          res.body.should.be.a('object');
+          res.body.should.have.property('name').eql('NotFoundError');
+        });
+    });
+
+    it('should not get comment with invalid ID', function () {
+      const invalidId = `id_${faker.random.number()}`;
+      return chai.request(app)
+        .get(`/comments/${invalidId}`)
+        .then((res) => {
+          res.should.have.status(422);
+          res.body.should.be.a('array');
+          res.body[0].should.have.property('error');
+          res.body[0].should.have.property('name');
+          res.body[0].should.have.property('path');
+          res.body[0].should.have.property('value').eql(invalidId);
+        });
+    });
   });
 
   describe('POST requests', function () {

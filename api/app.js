@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 
 const authorRoutes = require('./routes/authorRoutes');
 const postRoutes = require('./routes/postRoutes');
+const commentRoutes = require('./routes/commentRoutes');
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use('/authors', authorRoutes);
 app.use('/posts', postRoutes);
+app.use('/comments', commentRoutes);
 
 app.use((err, req, res, next) => {
   const formatError = ({ message, path, value }) => ({
