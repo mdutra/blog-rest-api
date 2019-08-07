@@ -1,14 +1,30 @@
 const { body, param, sanitizeBody } = require('express-validator');
 
 const Comment = require('../models/commentModel');
+const Post = require('../models/postModel');
 const { throwValidationResults } = require('../utils/');
 
 const commentController = {
-  findAllPostComments(req, res, next) {
-    Comment.find()
-      .then(res.json.bind(res))
-      .catch(next);
-  },
+  findAllPostComments: [
+    param('id').isMongoId(),
+
+    throwValidationResults,
+
+    (req, res, next) => {
+      Post.findById(req.params.id)
+        .populate('comments')
+        .then((post) => {
+          if (!post) {
+            const err = new Error('Blog post not found for the given ObjectId');
+            err.name = 'NotFoundError';
+            throw err;
+          }
+
+          res.json(post.comments);
+        })
+        .catch(next);
+    },
+  ],
   findCommentById: [
     param('id').isMongoId(),
 
