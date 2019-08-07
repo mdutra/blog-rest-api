@@ -82,7 +82,7 @@ describe('Comments', function () {
 
   describe('GET requests', function () {
     it('should get all comments from a blog post', function () {
-      Post.findOne()
+      return Post.findOne()
         .then(({ _id }) => chai.request(app)
           .get(`/posts/${_id}/comments`))
         .then((res) => {
