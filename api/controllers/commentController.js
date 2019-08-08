@@ -12,7 +12,7 @@ const commentController = {
 
     (req, res, next) => {
       Post.findById(req.params.id)
-        .populate('comments')
+        .populate({ path: 'comments', model: Comment })
         .then((post) => {
           if (!post) {
             const err = new Error('Blog post not found for the given ObjectId');
