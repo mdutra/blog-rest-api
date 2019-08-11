@@ -63,6 +63,21 @@ describe('Authors', function () {
         });
     });
 
+    it('should get limited list of authors', function () {
+      return chai.request(app)
+        .get('/authors?limit=5')
+        .then((res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          res.body.length.should.be.eql(5);
+          res.body.forEach((author) => {
+            author.should.be.a('object');
+            author.should.have.property('firstName');
+            author.should.have.property('lastName');
+          });
+        });
+    });
+
     it('should not find author by ID after deleting it', function () {
       return Author.findOneAndDelete()
         .then(({ _id }) => chai.request(app)

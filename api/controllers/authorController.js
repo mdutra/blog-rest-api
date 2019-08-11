@@ -1,14 +1,20 @@
-const { body, param, sanitizeBody } = require('express-validator');
+const {
+  body, param, query, sanitizeBody,
+} = require('express-validator');
 
 const Author = require('../models/authorModel');
 const { throwValidationResults } = require('../utils/');
 
 const authorController = {
-  findAllAuthors(req, res, next) {
-    Author.find()
-      .then(res.json.bind(res))
-      .catch(next);
-  },
+  findAllAuthors: [
+    query('limit').toInt(),
+
+    (req, res, next) => {
+      Author.find({}, {}, { limit: req.query.limit })
+        .then(res.json.bind(res))
+        .catch(next);
+    },
+  ],
   findAuthorById: [
     param('id').isMongoId(),
 
