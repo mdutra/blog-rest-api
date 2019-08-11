@@ -48,6 +48,11 @@ describe('Posts', function () {
     mongoose.deleteModel(/.+/);
   });
 
+  after(function () {
+    Author.collection.drop();
+    Post.collection.drop();
+  });
+
   describe('GET requests', function () {
     it('should get list of posts', function () {
       return chai.request(app)
@@ -60,6 +65,7 @@ describe('Posts', function () {
             post.should.have.property('title');
             post.should.have.property('subtitle');
             post.should.have.property('content');
+            post.should.have.property('permalink');
             post.should.have.property('authors');
             post.authors.should.be.a('array');
             post.authors.length.should.be.above(0);
@@ -77,6 +83,7 @@ describe('Posts', function () {
           res.body.should.have.property('title');
           res.body.should.have.property('content');
           res.body.should.have.property('published');
+          res.body.should.have.property('permalink');
           res.body.should.have.property('authors');
           res.body.authors.length.should.be.above(0);
         });
@@ -131,6 +138,7 @@ describe('Posts', function () {
           res.body.should.have.property('subtitle');
           res.body.should.have.property('content');
           res.body.should.have.property('published');
+          res.body.should.have.property('permalink');
           res.body.should.have.property('authors');
           res.body.authors.length.should.be.above(0);
         });
@@ -153,6 +161,37 @@ describe('Posts', function () {
             error.should.have.property('name').eql('ValidationError');
             error.should.have.property('path');
           });
+        });
+    });
+
+    it('should not store blog post with the same title', function () {
+      return Author.findOne()
+        .then(({ _id }) => {
+          const post = {
+            title: faker.lorem.words(),
+            content: faker.lorem.paragraphs(),
+            authors: [_id],
+          };
+
+          const requester = chai.request(app).keepOpen();
+
+          return requester.post('/posts').send(post)
+            .then((res) => {
+              res.should.have.status(200);
+              res.body.should.be.a('object');
+              res.body.should.have.property('title');
+              res.body.should.have.property('content');
+              res.body.should.have.property('authors');
+
+              return requester.post('/posts').send(post);
+            })
+            .then((res) => {
+              res.should.have.status(422);
+              res.body.should.be.a('object');
+              res.body.should.have.property('message');
+              res.body.should.have.property('name').eql('MongoError');
+            })
+            .then(() => requester.close());
         });
     });
   });

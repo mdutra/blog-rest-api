@@ -1,7 +1,8 @@
 const { model, Schema } = require('mongoose');
+const slugify = require('slugify');
 
 const postSchema = new Schema({
-  title: { type: String, required: true },
+  title: { type: String, required: true, unique: true },
   subtitle: String,
   published: { type: Date, default: Date.now },
   updated: Date,
@@ -11,6 +12,13 @@ const postSchema = new Schema({
     validate: [a => a.length > 0, 'At least one author is required'],
   },
   comments: [{ type: Schema.Types.ObjectId, ref: 'comments' }],
+  permalink: {
+    type: String,
+    unique: true,
+    default: function genPermalink() {
+      return slugify(this.title);
+    },
+  },
 }, {
   versionKey: false,
 });

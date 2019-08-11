@@ -41,6 +41,8 @@ const postController = {
     throwValidationResults,
 
     (req, res, next) => {
+      delete req.body.permalink;
+
       Post.create(req.body)
         .then(res.json.bind(res))
         .catch(next);
@@ -70,8 +72,9 @@ const postController = {
         useFindAndModify: false,
       };
 
-      // Prevent field from update
+      // Prevent fields from update
       delete replacement.published;
+      delete replacement.permalink;
 
       replacement.updated = new Date();
 

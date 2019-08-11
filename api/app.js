@@ -14,10 +14,12 @@ const mongoUrl = config.get('mongoUrl');
 
 debug(`Connecting to ${mongoUrl}`);
 
-mongoose.connect(mongoUrl, { useNewUrlParser: true })
-  .catch(() => {
-    console.error('Unable to connect to MongoDB');
-  });
+mongoose.connect(mongoUrl, {
+  useCreateIndex: true,
+  useNewUrlParser: true,
+}).catch(() => {
+  console.error('Unable to connect to MongoDB');
+});
 
 // Body parser
 app.use(express.json());
@@ -51,6 +53,17 @@ app.use((err, req, res, next) => {
       break;
     default:
       next(err);
+  }
+});
+
+app.use((err, req, res, next) => {
+  if (err.name === 'MongoError' && err.code === 11000) {
+    res.status(422).send({
+      message: err.message,
+      name: err.name,
+    });
+  } else {
+    next(err);
   }
 });
 
