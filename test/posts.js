@@ -107,6 +107,31 @@ describe('Posts', function () {
         });
     });
 
+    it('should get list of authors from a specific range', function () {
+      const offset = 3;
+      const limit = 4;
+
+      return Promise.all([
+        Post.find(),
+        chai.request(app)
+          .get(`/posts?offset=${offset}&limit=${limit}`),
+      ])
+        .then(([posts, res]) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          res.body.length.should.be.eql(limit);
+          res.body.forEach((post, i) => {
+            post.should.be.a('object');
+            post.should.have.property('_id').eql(posts[offset + i].id);
+            post.should.have.property('title');
+            post.should.have.property('content');
+            post.should.have.property('published');
+            post.should.have.property('permalink');
+            post.should.have.property('authors');
+          });
+        });
+    });
+
     it('should not find blog post by ID after deleting it', function () {
       return Post.findOneAndDelete()
         .then(({ _id }) => chai.request(app)

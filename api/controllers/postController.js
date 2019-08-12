@@ -8,10 +8,15 @@ const { throwValidationResults } = require('../utils/');
 const postController = {
   findAllPosts: [
     query('limit').toInt(),
+    query('offset').toInt(),
 
     (req, res, next) => {
-      const { limit } = req.query;
-      Post.find({}, {}, { limit })
+      const { offset, limit } = req.query;
+
+      Post.find({}, {}, {
+        skip: offset,
+        limit,
+      })
         .then(res.json.bind(res))
         .catch(next);
     },
