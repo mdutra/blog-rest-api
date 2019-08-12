@@ -30,16 +30,21 @@ Add new author:
 $ curl -d 'firstName=João&lastName=Silva' http://localhost:3000/authors 
 ```
 ### All endpoints
+Blog posts:
 ```
 /posts [GET, POST]
 /posts?offset={n}&limit={n} [GET]
 /posts/{id} [GET, PUT, DELETE]
 /posts/permalink/{permalink} [GET]
-
+```
+Comments:
+```
 /posts/{id}/comments [GET, POST]
 /posts/{id}/comments?offset={n}&limit={n}&q={query} [GET]
 /comments/{id} [GET, PUT, DELETE]
-
+```
+Authors:
+```
 /authors [GET, POST]
 /authors?offset={n}&limit={n} [GET]
 /authors/{id} [GET, PUT, DELETE]
