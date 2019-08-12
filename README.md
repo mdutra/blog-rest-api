@@ -26,6 +26,7 @@ $ curl -d 'firstName=João&lastName=Silva' http://localhost:3000/authors
 ### Endpoints
 ```
 /posts [GET, POST]
+/posts?offset={n}&limit={n} [GET]
 /posts/{id} [GET, PUT, DELETE]
 
 /posts/{id}/comments [GET, POST]
