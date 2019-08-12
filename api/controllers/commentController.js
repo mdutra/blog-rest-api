@@ -25,6 +25,11 @@ const commentController = {
             throw err;
           }
 
+          // Filter comments with query in "q"
+          const comments = req.query.q
+            ? post.comments.filter(({ content }) => content.includes(req.query.q))
+            : post.comments;
+
           // Pagination
           const offset = req.query.offset || 0;
           const { limit } = req.query;
@@ -36,7 +41,7 @@ const commentController = {
             sliceArgs.push(offset + limit);
           }
 
-          const result = post.comments.slice(...sliceArgs);
+          const result = comments.slice(...sliceArgs);
 
           res.json(result);
         })

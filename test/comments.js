@@ -144,6 +144,29 @@ describe('Comments', function () {
           }));
     });
 
+    it('should search by content and find at least one comment', function () {
+      return Post.findOne().populate({ path: 'comments', model: Comment })
+        .then(({ _id, comments }) => {
+          const [q] = comments[0].content.split(' ');
+          const { length } = comments;
+
+          return chai.request(app)
+            .get(`/posts/${_id}/comments?q=${q}`)
+            .then((res) => {
+              res.should.have.status(200);
+              res.body.should.be.a('array');
+              res.body.length.should.be.above(0);
+              res.body.length.should.be.below(length);
+              res.body.forEach((comment) => {
+                comment.should.be.a('object');
+                comment.should.have.property('content');
+                comment.should.have.property('published');
+                comment.should.have.property('user');
+              });
+            });
+        });
+    });
+
     it('should not find comment by ID after deleting it', function () {
       return Comment.findOneAndDelete()
         .then(({ _id }) => chai.request(app)

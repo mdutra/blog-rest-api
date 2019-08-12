@@ -29,7 +29,7 @@ $ curl -d 'firstName=João&lastName=Silva' http://localhost:3000/authors
 /posts/{id} [GET, PUT, DELETE]
 
 /posts/{id}/comments [GET, POST]
-/posts/{id}/comments?offset={n}&limit={n} [GET]
+/posts/{id}/comments?offset={n}&limit={n}&q={query} [GET]
 /comments/{id} [GET, PUT, DELETE]
 
 /authors [GET, POST]
