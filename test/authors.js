@@ -78,6 +78,28 @@ describe('Authors', function () {
         });
     });
 
+    it('should get list of authors from a specific range', function () {
+      const offset = 3;
+      const limit = 4;
+
+      return Promise.all([
+        Author.find(),
+        chai.request(app)
+          .get(`/authors?offset=${offset}&limit=${limit}`),
+      ])
+        .then(([authors, res]) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          res.body.length.should.be.eql(limit);
+          res.body.forEach((author, i) => {
+            author.should.be.a('object');
+            author.should.have.property('_id').eql(authors[offset + i].id);
+            author.should.have.property('firstName');
+            author.should.have.property('lastName');
+          });
+        });
+    });
+
     it('should not find author by ID after deleting it', function () {
       return Author.findOneAndDelete()
         .then(({ _id }) => chai.request(app)

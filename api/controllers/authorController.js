@@ -8,9 +8,13 @@ const { throwValidationResults } = require('../utils/');
 const authorController = {
   findAllAuthors: [
     query('limit').toInt(),
+    query('offset').toInt(),
 
     (req, res, next) => {
-      Author.find({}, {}, { limit: req.query.limit })
+      Author.find({}, {}, {
+        skip: req.query.offset,
+        limit: req.query.limit,
+      })
         .then(res.json.bind(res))
         .catch(next);
     },
