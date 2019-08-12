@@ -1,4 +1,6 @@
-const { body, param, sanitizeBody } = require('express-validator');
+const {
+  body, param, query, sanitizeBody,
+} = require('express-validator');
 
 const Comment = require('../models/commentModel');
 const Post = require('../models/postModel');
@@ -7,6 +9,9 @@ const { throwValidationResults } = require('../utils/');
 const commentController = {
   findAllPostComments: [
     param('id').isMongoId(),
+
+    query('offset').toInt(),
+    query('limit').toInt(),
 
     throwValidationResults,
 
@@ -20,7 +25,25 @@ const commentController = {
             throw err;
           }
 
-          res.json(post.comments);
+          // Filter comments with query in "q"
+          const comments = req.query.q
+            ? post.comments.filter(({ content }) => content.includes(req.query.q))
+            : post.comments;
+
+          // Pagination
+          const offset = req.query.offset || 0;
+          const { limit } = req.query;
+
+          // Use an array because the second arg should be set only if it's not zero
+          const sliceArgs = [offset];
+
+          if (limit) {
+            sliceArgs.push(offset + limit);
+          }
+
+          const result = comments.slice(...sliceArgs);
+
+          res.json(result);
         })
         .catch(next);
     },
