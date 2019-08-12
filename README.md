@@ -15,15 +15,21 @@ Start the MongoDB server and run:
 $ npm run serve
 ```
 ### Examples
-List blog posts:
+Get one blog post by permalink
 ```
-$ curl http://localhost:3000/posts 
+$ curl http://localhost:3000/posts/permalink/Um-titulo-qualquer
+```
+Blog posts pagination (3 at a time):
+```
+$ curl "localhost:3000/posts?offset=0&limit=3" 
+$ curl "localhost:3000/posts?offset=3&limit=3" 
+$ curl "localhost:3000/posts?offset=6&limit=3" 
 ```
 Add new author:
 ```
 $ curl -d 'firstName=João&lastName=Silva' http://localhost:3000/authors 
 ```
-### Endpoints
+### All endpoints
 ```
 /posts [GET, POST]
 /posts?offset={n}&limit={n} [GET]

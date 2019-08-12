@@ -17,7 +17,10 @@ function randomId(arr) {
   return arr[Math.floor(Math.random() * arr.length)].id;
 }
 
-mongoose.connect(mongoUrl, { useNewUrlParser: true })
+mongoose.connect(mongoUrl, {
+  useCreateIndex: true,
+  useNewUrlParser: true,
+})
   .then(() => Promise.all([
     Author.deleteMany({}),
     Post.deleteMany({}),
@@ -52,6 +55,14 @@ mongoose.connect(mongoUrl, { useNewUrlParser: true })
         comments: [...new Array(10)]
           .map(() => randomId(comments)),
       }));
+
+    posts.push(new Post({
+      title: 'Um título qualquer',
+      content: faker.lorem.paragraphs(),
+      authors: [randomId(authors)],
+      comments: [...new Array(10)]
+        .map(() => randomId(comments)),
+    }));
 
     return Promise.all([
       ...(users.map(user => user.save())),
