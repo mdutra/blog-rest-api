@@ -1,4 +1,6 @@
-const { body, param, sanitizeBody } = require('express-validator');
+const {
+  body, param, query, sanitizeBody,
+} = require('express-validator');
 
 const Comment = require('../models/commentModel');
 const Post = require('../models/postModel');
@@ -7,6 +9,8 @@ const { throwValidationResults } = require('../utils/');
 const commentController = {
   findAllPostComments: [
     param('id').isMongoId(),
+
+    query('limit').toInt(),
 
     throwValidationResults,
 
@@ -20,7 +24,9 @@ const commentController = {
             throw err;
           }
 
-          res.json(post.comments);
+          const { limit } = req.query;
+
+          res.json(post.comments.slice(0, limit));
         })
         .catch(next);
     },

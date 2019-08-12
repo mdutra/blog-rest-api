@@ -106,6 +106,23 @@ describe('Comments', function () {
         });
     });
 
+    it('should get limited list of comments', function () {
+      return Post.findOne()
+        .then(({ _id }) => chai.request(app)
+          .get(`/posts/${_id}/comments?limit=5`))
+        .then((res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          res.body.length.should.be.eql(5);
+          res.body.forEach((comment) => {
+            comment.should.be.a('object');
+            comment.should.have.property('content');
+            comment.should.have.property('published');
+            comment.should.have.property('user');
+          });
+        });
+    });
+
     it('should not find comment by ID after deleting it', function () {
       return Comment.findOneAndDelete()
         .then(({ _id }) => chai.request(app)
