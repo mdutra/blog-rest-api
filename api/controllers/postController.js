@@ -40,6 +40,19 @@ const postController = {
         .catch(next);
     },
   ],
+  findPostByPermalink(req, res, next) {
+    Post.findOne({ permalink: req.params.permalink })
+      .then((post) => {
+        if (!post) {
+          const err = new Error('Blog post not found for the given permalink');
+          err.name = 'NotFoundError';
+          throw err;
+        }
+
+        res.json(post);
+      })
+      .catch(next);
+  },
   createPost: [
     body('title').isString().trim().isLength({ max: 500 }),
     body('subtitle').optional({ checkFalsy: true }).isString().trim()

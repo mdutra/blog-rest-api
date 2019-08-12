@@ -14,6 +14,9 @@ router.route('/:id')
   .put(postController.updatePost)
   .delete(postController.deletePost);
 
+router.route('/permalink/:permalink')
+  .get(postController.findPostByPermalink);
+
 router.route('/:id/comments')
   .get(commentController.findAllPostComments)
   .post(commentController.createComment);

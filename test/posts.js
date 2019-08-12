@@ -132,6 +132,22 @@ describe('Posts', function () {
         });
     });
 
+    it('should get blog post by permalink', function () {
+      return Post.findOne()
+        .then(({ permalink }) => chai.request(app)
+          .get(`/posts/permalink/${permalink}`))
+        .then((res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          res.body.should.have.property('title');
+          res.body.should.have.property('content');
+          res.body.should.have.property('published');
+          res.body.should.have.property('permalink');
+          res.body.should.have.property('authors');
+          res.body.authors.length.should.be.above(0);
+        });
+    });
+
     it('should not find blog post by ID after deleting it', function () {
       return Post.findOneAndDelete()
         .then(({ _id }) => chai.request(app)
