@@ -18,6 +18,7 @@ const postSchema = new Schema({
     default: function genPermalink() {
       return slugify(this.title);
     },
+    index: true,
   },
 }, {
   versionKey: false,
