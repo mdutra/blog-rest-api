@@ -25,8 +25,18 @@ const commentController = {
             throw err;
           }
 
-          const { offset, limit } = req.query;
-          const result = post.comments.slice(offset, (offset || 0) + limit);
+          // Pagination
+          const offset = req.query.offset || 0;
+          const { limit } = req.query;
+
+          // Use an array because the second arg should be set only if it's not zero
+          const sliceArgs = [offset];
+
+          if (limit) {
+            sliceArgs.push(offset + limit);
+          }
+
+          const result = post.comments.slice(...sliceArgs);
 
           res.json(result);
         })
