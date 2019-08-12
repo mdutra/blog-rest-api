@@ -89,6 +89,24 @@ describe('Posts', function () {
         });
     });
 
+    it('should get limited list of blog posts', function () {
+      return chai.request(app)
+        .get('/posts?limit=5')
+        .then((res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          res.body.length.should.be.eql(5);
+          res.body.forEach((post) => {
+            post.should.be.a('object');
+            post.should.have.property('title');
+            post.should.have.property('content');
+            post.should.have.property('published');
+            post.should.have.property('permalink');
+            post.should.have.property('authors');
+          });
+        });
+    });
+
     it('should not find blog post by ID after deleting it', function () {
       return Post.findOneAndDelete()
         .then(({ _id }) => chai.request(app)

@@ -1,14 +1,21 @@
-const { body, param, sanitizeBody } = require('express-validator');
+const {
+  body, param, query, sanitizeBody,
+} = require('express-validator');
 
 const Post = require('../models/postModel');
 const { throwValidationResults } = require('../utils/');
 
 const postController = {
-  findAllPosts(req, res, next) {
-    Post.find()
-      .then(res.json.bind(res))
-      .catch(next);
-  },
+  findAllPosts: [
+    query('limit').toInt(),
+
+    (req, res, next) => {
+      const { limit } = req.query;
+      Post.find({}, {}, { limit })
+        .then(res.json.bind(res))
+        .catch(next);
+    },
+  ],
   findPostById: [
     param('id').isMongoId(),
 
