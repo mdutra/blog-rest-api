@@ -123,6 +123,27 @@ describe('Comments', function () {
         });
     });
 
+    it('should get list of comments from a specific range', function () {
+      const offset = 3;
+      const limit = 4;
+
+      return Post.findOne().populate({ path: 'comments', model: Comment })
+        .then(post => chai.request(app)
+          .get(`/posts/${post.id}/comments?offset=${offset}&limit=${limit}`)
+          .then((res) => {
+            res.should.have.status(200);
+            res.body.should.be.a('array');
+            res.body.length.should.be.eql(limit);
+            res.body.forEach((comment, i) => {
+              comment.should.be.a('object');
+              comment.should.have.property('_id').eql(post.comments[offset + i].id);
+              comment.should.have.property('content');
+              comment.should.have.property('published');
+              comment.should.have.property('user');
+            });
+          }));
+    });
+
     it('should not find comment by ID after deleting it', function () {
       return Comment.findOneAndDelete()
         .then(({ _id }) => chai.request(app)

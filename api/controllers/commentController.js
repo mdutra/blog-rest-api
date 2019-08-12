@@ -10,6 +10,7 @@ const commentController = {
   findAllPostComments: [
     param('id').isMongoId(),
 
+    query('offset').toInt(),
     query('limit').toInt(),
 
     throwValidationResults,
@@ -24,9 +25,10 @@ const commentController = {
             throw err;
           }
 
-          const { limit } = req.query;
+          const { offset, limit } = req.query;
+          const result = post.comments.slice(offset, (offset || 0) + limit);
 
-          res.json(post.comments.slice(0, limit));
+          res.json(result);
         })
         .catch(next);
     },
