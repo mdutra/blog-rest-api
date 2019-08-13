@@ -1,8 +1,14 @@
 const { validationResult } = require('express-validator');
 
 const utils = {
-  responseHandler(req, res) {
-    res.json(res.locals.data);
+  responseHandler(req, res, next) {
+    if (res.locals.data) {
+      res.json(res.locals.data);
+    } else {
+      const err = new Error('Missing response data');
+
+      next(err);
+    }
   },
   throwValidationResults(req, res, next) {
     try {
