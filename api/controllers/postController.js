@@ -4,11 +4,7 @@ const {
 
 const Post = require('../models/postModel');
 const cache = require('../middlewares/cache');
-const { throwValidationResults } = require('../utils/');
-
-function responseHandler(req, res) {
-  res.json(res.locals.data);
-}
+const { responseHandler, throwValidationResults } = require('../utils/');
 
 const postController = {
   findAllPosts: [

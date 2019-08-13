@@ -1,6 +1,9 @@
 const { validationResult } = require('express-validator');
 
 const utils = {
+  responseHandler(req, res) {
+    res.json(res.locals.data);
+  },
   throwValidationResults(req, res, next) {
     try {
       validationResult(req)

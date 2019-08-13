@@ -3,12 +3,8 @@ const {
 } = require('express-validator');
 
 const Author = require('../models/authorModel');
-const { throwValidationResults } = require('../utils/');
+const { responseHandler, throwValidationResults } = require('../utils/');
 const cache = require('../middlewares/cache');
-
-function responseHandler(req, res) {
-  res.json(res.locals.data);
-}
 
 const authorController = {
   findAllAuthors: [
