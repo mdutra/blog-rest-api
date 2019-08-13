@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 
-const utils = {
+const common = {
   responseHandler(req, res, next) {
     if (res.locals.data) {
       res.json(res.locals.data);
@@ -28,4 +28,4 @@ const utils = {
   },
 };
 
-module.exports = utils;
+module.exports = common;

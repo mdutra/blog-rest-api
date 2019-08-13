@@ -3,7 +3,7 @@ const {
 } = require('express-validator');
 
 const Author = require('../models/authorModel');
-const { responseHandler, throwValidationResults } = require('../utils/');
+const { responseHandler, throwValidationResults } = require('../middlewares/common');
 const cache = require('../middlewares/cache');
 
 const authorController = {

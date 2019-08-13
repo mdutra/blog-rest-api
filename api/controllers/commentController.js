@@ -5,7 +5,7 @@ const {
 const cache = require('../middlewares/cache');
 const Comment = require('../models/commentModel');
 const Post = require('../models/postModel');
-const { responseHandler, throwValidationResults } = require('../utils/');
+const { responseHandler, throwValidationResults } = require('../middlewares/common');
 
 const commentController = {
   findAllPostComments: [
