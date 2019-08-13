@@ -4,9 +4,16 @@ const {
 
 const Author = require('../models/authorModel');
 const { throwValidationResults } = require('../utils/');
+const cache = require('../middlewares/cache');
+
+function responseHandler(req, res) {
+  res.json(res.locals.data);
+}
 
 const authorController = {
   findAllAuthors: [
+    cache.get,
+
     query('limit').toInt(),
     query('offset').toInt(),
 
@@ -15,11 +22,21 @@ const authorController = {
         skip: req.query.offset,
         limit: req.query.limit,
       })
-        .then(res.json.bind(res))
+        .then((authors) => {
+          res.locals.data = authors;
+
+          next();
+        })
         .catch(next);
     },
+
+    cache.set,
+
+    responseHandler,
   ],
   findAuthorById: [
+    cache.get,
+
     param('id').isMongoId(),
 
     throwValidationResults,
@@ -33,10 +50,16 @@ const authorController = {
             throw err;
           }
 
-          res.json(author);
+          res.locals.data = author;
+
+          next();
         })
         .catch(next);
     },
+
+    cache.set,
+
+    responseHandler,
   ],
   createAuthor: [
     body('firstName').isString().trim().isLength({ max: 100 }),
@@ -48,9 +71,17 @@ const authorController = {
 
     (req, res, next) => {
       Author.create(req.body)
-        .then(res.json.bind(res))
+        .then((author) => {
+          res.locals.data = author;
+
+          next();
+        })
         .catch(next);
     },
+
+    cache.clear,
+
+    responseHandler,
   ],
   updateAuthor: [
     param('id').isMongoId(),
@@ -80,10 +111,16 @@ const authorController = {
             throw err;
           }
 
-          res.json(author);
+          res.locals.data = author;
+
+          next();
         })
         .catch(next);
     },
+
+    cache.clear,
+
+    responseHandler,
   ],
   deleteAuthor: [
     param('id').isMongoId(),
@@ -93,9 +130,15 @@ const authorController = {
     (req, res, next) => {
       Author.deleteOne({ _id: req.params.id })
         .then(() => {
-          res.status(204).json({});
+          next();
         })
         .catch(next);
+    },
+
+    cache.clear,
+
+    (req, res) => {
+      res.status(204).json({});
     },
   ],
 };
