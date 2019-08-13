@@ -3,10 +3,17 @@ const {
 } = require('express-validator');
 
 const Post = require('../models/postModel');
+const cache = require('../middlewares/cache');
 const { throwValidationResults } = require('../utils/');
+
+function responseHandler(req, res) {
+  res.json(res.locals.data);
+}
 
 const postController = {
   findAllPosts: [
+    cache.get,
+
     query('limit').toInt(),
     query('offset').toInt(),
 
@@ -17,11 +24,21 @@ const postController = {
         skip: offset,
         limit,
       })
-        .then(res.json.bind(res))
+        .then((posts) => {
+          res.locals.data = posts;
+
+          next();
+        })
         .catch(next);
     },
+
+    cache.set,
+
+    responseHandler,
   ],
   findPostById: [
+    cache.get,
+
     param('id').isMongoId(),
 
     throwValidationResults,
@@ -35,24 +52,40 @@ const postController = {
             throw err;
           }
 
-          res.json(post);
+          res.locals.data = post;
+
+          next();
         })
         .catch(next);
     },
-  ],
-  findPostByPermalink(req, res, next) {
-    Post.findOne({ permalink: req.params.permalink })
-      .then((post) => {
-        if (!post) {
-          const err = new Error('Blog post not found for the given permalink');
-          err.name = 'NotFoundError';
-          throw err;
-        }
 
-        res.json(post);
-      })
-      .catch(next);
-  },
+    cache.set,
+
+    responseHandler,
+  ],
+  findPostByPermalink: [
+    cache.get,
+
+    (req, res, next) => {
+      Post.findOne({ permalink: req.params.permalink })
+        .then((post) => {
+          if (!post) {
+            const err = new Error('Blog post not found for the given permalink');
+            err.name = 'NotFoundError';
+            throw err;
+          }
+
+          res.locals.data = post;
+
+          next();
+        })
+        .catch(next);
+    },
+
+    cache.set,
+
+    responseHandler,
+  ],
   createPost: [
     body('title').isString().trim().isLength({ max: 500 }),
     body('subtitle').optional({ checkFalsy: true }).isString().trim()
@@ -69,9 +102,17 @@ const postController = {
       delete req.body.permalink;
 
       Post.create(req.body)
-        .then(res.json.bind(res))
+        .then((post) => {
+          res.locals.data = post;
+
+          next();
+        })
         .catch(next);
     },
+
+    cache.clear,
+
+    responseHandler,
   ],
   updatePost: [
     param('id').isMongoId(),
@@ -111,10 +152,16 @@ const postController = {
             throw err;
           }
 
-          res.json(post);
+          res.locals.data = post;
+
+          next();
         })
         .catch(next);
     },
+
+    cache.clear,
+
+    responseHandler,
   ],
   deletePost: [
     param('id').isMongoId(),
@@ -124,9 +171,15 @@ const postController = {
     (req, res, next) => {
       Post.findByIdAndDelete(req.params.id)
         .then(() => {
-          res.status(204).json({});
+          next();
         })
         .catch(next);
+    },
+
+    cache.clear,
+
+    (req, res) => {
+      res.status(204).json({});
     },
   ],
 };
