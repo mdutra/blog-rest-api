@@ -2,12 +2,19 @@ const {
   body, param, query, sanitizeBody,
 } = require('express-validator');
 
+const cache = require('../middlewares/cache');
 const Comment = require('../models/commentModel');
 const Post = require('../models/postModel');
 const { throwValidationResults } = require('../utils/');
 
+function responseHandler(req, res) {
+  res.json(res.locals.data);
+}
+
 const commentController = {
   findAllPostComments: [
+    cache.get,
+
     param('id').isMongoId(),
 
     query('offset').toInt(),
@@ -41,14 +48,20 @@ const commentController = {
             sliceArgs.push(offset + limit);
           }
 
-          const result = comments.slice(...sliceArgs);
+          res.locals.data = comments.slice(...sliceArgs);
 
-          res.json(result);
+          next();
         })
         .catch(next);
     },
+
+    cache.set,
+
+    responseHandler,
   ],
   findCommentById: [
+    cache.get,
+
     param('id').isMongoId(),
 
     throwValidationResults,
@@ -62,10 +75,16 @@ const commentController = {
             throw err;
           }
 
-          res.json(comment);
+          res.locals.data = comment;
+
+          next();
         })
         .catch(next);
     },
+
+    cache.set,
+
+    responseHandler,
   ],
   createComment: [
     param('id').isMongoId(),
@@ -95,11 +114,17 @@ const commentController = {
           ]);
         })
         .then((response) => {
-          // Return saved comment
-          res.json(response[0]);
+          // Respond with saved comment
+          [res.locals.data] = response;
+
+          next();
         })
         .catch(next);
     },
+
+    cache.clear,
+
+    responseHandler,
   ],
   updateComment: [
     param('id').isMongoId(),
@@ -130,10 +155,16 @@ const commentController = {
             throw err;
           }
 
-          res.json(comment);
+          res.locals.data = comment;
+
+          next();
         })
         .catch(next);
     },
+
+    cache.clear,
+
+    responseHandler,
   ],
   deleteComment: [
     param('id').isMongoId(),
@@ -143,10 +174,17 @@ const commentController = {
     (req, res, next) => {
       Comment.findByIdAndDelete(req.params.id)
         .then(() => {
-          res.status(204).json({});
+          res.status(204);
+          res.locals.data = {};
+
+          next();
         })
         .catch(next);
     },
+
+    cache.clear,
+
+    responseHandler,
   ],
 };
 
