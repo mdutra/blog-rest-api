@@ -171,6 +171,9 @@ const postController = {
     (req, res, next) => {
       Post.findByIdAndDelete(req.params.id)
         .then(() => {
+          res.status(204);
+          res.locals.data = {};
+
           next();
         })
         .catch(next);
@@ -178,9 +181,7 @@ const postController = {
 
     cache.clear,
 
-    (req, res) => {
-      res.status(204).json({});
-    },
+    responseHandler,
   ],
 };
 

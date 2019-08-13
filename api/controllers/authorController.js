@@ -130,6 +130,9 @@ const authorController = {
     (req, res, next) => {
       Author.deleteOne({ _id: req.params.id })
         .then(() => {
+          res.status(204);
+          res.locals.data = {};
+
           next();
         })
         .catch(next);
@@ -137,9 +140,7 @@ const authorController = {
 
     cache.clear,
 
-    (req, res) => {
-      res.status(204).json({});
-    },
+    responseHandler,
   ],
 };
 
