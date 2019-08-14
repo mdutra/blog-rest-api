@@ -1,16 +1,18 @@
 ## Blog REST API
 
 ### Installation
-Dependencies: Node.js, NPM and MongoDB.
+- Install [Node.js](https://nodejs.org/en/) and [MongoDB](https://www.mongodb.com/) on your computer.
+- Install project dependencies:
 ```
 $ npm install
 ```
 ### Usage
-Store fake data on the database:
+- Start the MongoDB service.
+- Generate fake data for the database:
 ```
 $ npm run populatedb
 ```
-Start the MongoDB server and run:
+- Start the API server:
 ```
 $ npm run serve
 ```
